@@ -104,7 +104,7 @@ class LinkedList {
             currentNode = currentNode.next;
         }
 
-        throw "whoopsie, your index sux butt lol/jk. no, but srsly, that index doesn't exist.";
+        throw "whoopsie, your index doesn't exist.";
 
     }
 
@@ -124,7 +124,7 @@ class LinkedList {
             currentNode = currentNode.next;
         }
 
-        throw "whoopsie, your index sux butt lol/jk. no, but srsly, that index doesn't exist.";
+        throw "whoopsie, your index doesn't exist.";
     }
 
     /** insertAt(idx, val): add node w/val before idx. */
@@ -155,7 +155,7 @@ class LinkedList {
             currentNode = currentNode.next;
         }
 
-        throw "whoopsie, your index sux butt lol/jk. no, but srsly, that index doesn't exist.";
+        throw "whoopsie, your index doesn't exist.";
 
     }
 
@@ -186,7 +186,7 @@ class LinkedList {
             currentNode = currentNode.next;
         }
 
-        throw "whoopsie, your index sux butt lol/jk. no, but srsly, that index doesn't exist.";
+        throw "whoopsie, your index doesn't exist.";
     }
 
     /** average(): return an average of all values in the list */

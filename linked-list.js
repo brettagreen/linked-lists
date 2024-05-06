@@ -11,9 +11,9 @@ class Node {
 
 class LinkedList {
     constructor(vals = []) {
-        this.head = null;
-        this.tail = null;
-        this.length = vals.length || 0;
+        this.head = null
+        this.tail = null
+        this.length = 0;
 
         for (let val of vals) {
             this.push(val);
@@ -25,16 +25,18 @@ class LinkedList {
     push(val) {
         let node = new Node(val);
 
-        if (this.head === null) {
+        if (!this.head) {
             this.head = node;
+            this.tail = node;
+        } else if (this.head && !this.tail) {
+            this.tail = node;
+            this.head.next = this.tail;
+        } else {
+            let tempnode = this.tail;
+            tempnode.next = node;
+            this.tail = node;
         }
-
-        if (this.tail !== null) {
-            this.tail.next = node;
-        }
-    
         this.length++;
-        this.tail = node;
     }
 
     /** unshift(val): add new value to start of list. */
@@ -42,8 +44,13 @@ class LinkedList {
     unshift(val) {
         let newNode = new Node(val);
 
-        newNode.next = this.head;
-        this.head = newNode;
+        if (this.length === 0) {
+            this.head = newNode;
+            this.tail = newNode;
+        } else {
+            newNode.next = this.head;
+            this.head = newNode;
+        }
 
         this.length++;
 
@@ -52,21 +59,30 @@ class LinkedList {
     /** pop(): return & remove last item. */
 
     pop() {
-        
+
         if (!this.tail || !this.head) {
             throw "whoopsie! list appears to be empty."
         }
 
-        let current = this.head;
+        if (this.length === 1) {
+            let rtr = this.head;
+            this.head = null;
+            this.tail = null;
+            this.length --;
+            return rtr.val;
+        }
 
-        while (current.next.next) {
+        let current = this.head.next || null
+        let prevnode = this.head;
+
+        while (current !== this.tail) {
+          prevnode = current;
           current = current.next;
         }
 
-        this.tail = current;
-        let returnVal = current.next.val;
-        current.next = null;
-
+        let returnVal = current.val;
+        prevnode.next = null;
+        this.tail = prevnode;
         this.length--;
         
         return returnVal;
@@ -78,21 +94,45 @@ class LinkedList {
         if (!this.tail || !this.head) {
             throw "whoopsie! list appears to be empty."
         }
-
-        let newHead = this.head.next;
-        this.head.next = null;
-        let returnVal = this.head;
-        this.head = newHead;
+        let returnVal;
+        if (this.length > 1) {
+            let newHead = this.head.next;
+            returnVal = this.head.val;
+            this.head = newHead;
+        } else {
+            returnVal = this.head.val;
+            this.head = null;
+            this.tail = null;
+        }
 
         this.length--;
         
-        return returnVal.val;
+        return returnVal
     }
 
     /** getAt(idx): get val at idx. */
 
     getAt(idx) {
 
+        let currentNode = this.head;
+        let count = 0;
+
+        while (count <= this.length -1) {
+            if (count === idx) {
+                return currentNode.val;
+            }
+            count++;
+
+            currentNode = currentNode.next;
+        }
+
+        throw "whoopsie, your index doesn't exist.";
+
+    }
+
+    /** getAtNode(idx): get node at idx. */
+
+    getAtNode(idx) {
         let currentNode = this.head;
         let count = 0;
 
@@ -131,35 +171,40 @@ class LinkedList {
     /** insertAt(idx, val): add node w/val before idx. */
 
     insertAt(idx, val) {
+        if (idx > this.length) {
+            throw "idx too large for number of nodes"
+        }
+
         let currentNode = this.head;
         let count = 0;
         let hold;
-        let newNode;
+        let newNode = new Node(val);
 
         if (this.length === 0) {
-            newNode = new Node(val);
             this.head = newNode;
             this.next = null;
+            this.tail = newNode;
             this.length++
             return;
+
         } else {
+
             while (count <= this.length -1) {
                 if (count + 1 === idx || idx === 0) {
-                    newNode = new Node(val);
     
                     if (idx === 0) {
                         this.head = newNode;
                     }
-    
-                    hold = currentNode.next;
-                    currentNode.next = newNode;
-                    newNode.next = hold;
-    
-                    if (idx === this.length -1) {
+                    
+                    if (idx < this.length) {
+                        hold = currentNode.next;
+                        currentNode.next = newNode; 
+                        newNode.next = hold; 
+                    } else {
                         hold = this.tail;
                         hold.next = newNode;
                         this.tail = newNode;
-                        currentNode.next = hold;
+                        currentNode.next = this.tail;
                         this.tail.next = null;
                     }
     
@@ -169,20 +214,20 @@ class LinkedList {
                 count++;
                 currentNode = currentNode.next;
             }
-    
-            throw "whoopsie, your index doesn't exist.";
         }
-
     }
 
     /** removeAt(idx): return & remove item at idx, */
 
     removeAt(idx) {
+        if (idx > this.length) {
+            throw "idx too large for number of nodes"
+        }
+
         let currentNode = this.head;
         let count = 0;
 
         if (this.length === 0) {
-            console.log('eh');
             throw "list is empty. there's nothing to remove";
         } else {
             while (count <= this.length -1) {
@@ -194,11 +239,12 @@ class LinkedList {
                         let nodeToRemove = currentNode.next;
                         currentNode.next = currentNode.next.next;
                         nodeToRemove = null;
-                        if (idx === this.length -1) {
-                            this.tail = currentNode;
-                        }
                     }
     
+                    if (idx === this.length -1) {
+                        this.tail = currentNode;
+                    }
+
                     this.length--;
                     return this;
                 }
@@ -215,7 +261,7 @@ class LinkedList {
 
     average() {
         if (this.length === 0) {
-            throw "this linked list conains no values to average";
+            return 0;
         }
 
         let currentNode = this.head;
@@ -231,6 +277,7 @@ class LinkedList {
     /** REVERSE IN PLACE i.e. 1,3,5,7,9 --> 9,7,5,3,1 */
 
     reverseInPlace() {
+        
         let currentNode = this.head;
         let count = 0;
 
@@ -241,15 +288,15 @@ class LinkedList {
                 this.head = this.tail;
                 this.tail = head;
                 this.tail.next = null;
-                this.getAt(this.length - 2).next = this.tail;
+                this.getAtNode(this.length - 2).next = this.tail;
             } else {
-                let firstNode = this.getAt(count);
-                let secondNode = this.getAt(this.length - count - 1);
+                let firstNode = this.getAtNode(count);
+                let secondNode = this.getAtNode(this.length - count - 1);
                 const secondNext = secondNode.next;
                 secondNode.next = firstNode.next;
                 firstNode.next = secondNext;
-                this.getAt(count - 1).next = secondNode;
-                this.getAt(this.length - count - 2).next = firstNode;
+                this.getAtNode(count - 1).next = secondNode;
+                this.getAtNode(this.length - count - 2).next = firstNode;
             }
 
             count++;
@@ -338,6 +385,8 @@ function sortSorted(list1, list2) {
         currentNode2 = currentNode2.next;
     }
 
+    sortedList.head = sortedList.getAtNode(0);
+    sortedList.tail = sortedList.getAtNode(sortedList.length -1);
     return sortedList;
 }
 
@@ -350,15 +399,5 @@ function iterate(ll) {
     }
 }
 
-// const lll = new LinkedList([3, 6, 9, 44, 100, 101]);
-// const ll = new LinkedList([2, 5, 7, 23, 41, 50, 77, 100]);
-// const result = sortSorted(ll, lll);
-// iterate(result);
-// const lll = new LinkedList([3, 6, 9, 10, 44, 101]);
-// const ll = new LinkedList([2,5,7,7,7,8,9,99])0;
-// const lll = new LinkedList([4, 12, 77, 99, 100]);
-// const newLL = sortSorted(ll, lll);
-// iterate(newLL);
 
-
-module.exports = LinkedList;
+module.exports = { LinkedList, Node, sortSorted, iterate }
